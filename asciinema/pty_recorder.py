@@ -16,7 +16,6 @@ from .stdout import Stdout
 class PtyRecorder(object):
 
     def record_command(self, command, output=None):
-        command = shlex.split(command)
         output = output if output is not None else Stdout()
         master_fd = None
 
@@ -93,7 +92,8 @@ class PtyRecorder(object):
         pid, master_fd = pty.fork()
 
         if pid == pty.CHILD:
-            os.execlp(command[0], *command)
+            cmd, args, kwargs = command
+            cmd(*args, **kwargs)
 
         old_handler = signal.signal(signal.SIGWINCH, _signal_winch)
 

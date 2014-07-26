@@ -1,4 +1,6 @@
 import os
+import shlex
+
 from . import timer
 
 from .asciicast import Asciicast
@@ -12,8 +14,17 @@ class Recorder(object):
         self.env = env if env is not None else os.environ
 
     def record(self, cmd, title):
-        duration, stdout = timer.timeit(self.pty_recorder.record_command,
-                                        cmd or self.env.get('SHELL', '/bin/sh'))
+        def _record_cmd(command):
+            command = shlex.split(command)
+            os.execlp(command[0], *command)
+
+        if not cmd:
+            cmd = self.env.get('SHELL', '/bin/sh')
+
+        if isinstance(cmd, str):
+            cmd = (_record_cmd,(cmd,),{})
+
+        duration, stdout = timer.timeit(self.pty_recorder.record_command, cmd)
 
         asciicast = Asciicast()
         asciicast.title = title
