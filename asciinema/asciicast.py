@@ -2,6 +2,7 @@ import os
 import subprocess
 import time
 
+from asciinema.recorder import Recorder
 
 class Asciicast(object):
 
@@ -11,8 +12,10 @@ class Asciicast(object):
         self.term = os.environ.get('TERM')
         self.username = os.environ.get('USER')
 
-    def record(self, recorder=None):
-        pass
+    def record(self, cmd=None, recorder=None, *args, **kwargs):
+        if recorder is None:
+            recorder = Recorder()
+        self.duration, stdout = recorder.record(cmd, *args, **kwargs)
 
     def upload(self, uploader=None):
         pass

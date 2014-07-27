@@ -2,6 +2,7 @@ import os
 
 from git import Repo
 from git.repo.fun import is_git_dir
+from asciinema.asciicast import Asciicast
 
 class AsciinemaCli(object):
 
@@ -19,5 +20,10 @@ class AsciinemaCli(object):
         return app.main()
 
     def main(self):
-        pass
+        title = None
+
+
+        cast = Asciicast(title)
+        cast.record()
+
 
