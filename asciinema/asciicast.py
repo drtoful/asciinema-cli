@@ -5,12 +5,17 @@ import time
 
 class Asciicast(object):
 
-    def __init__(self, env=os.environ):
-        self.command = None
-        self.title = None
-        self.shell = env.get('SHELL', '/bin/sh')
-        self.term = env.get('TERM')
-        self.username = env.get('USER')
+    def __init__(self, title=None):
+        self.title = title
+        self.shell = os.environ.get('SHELL', '/bin/sh')
+        self.term = os.environ.get('TERM')
+        self.username = os.environ.get('USER')
+
+    def record(self, recorder=None):
+        pass
+
+    def upload(self, uploader=None):
+        pass
 
     @property
     def meta_data(self):
