@@ -1,12 +1,32 @@
 import functools
 import json
+import datetime
+import time
 
-from git import Blob
-
+from git import Blob, Commit
 
 class ListCommand(object):
     def __init__(self, repo):
         self.repo = repo
+
+    def _timesince(self, when):
+        # convert when to datetime
+        if type(when) == int:
+            when = datetime.datetime.utcfromtimestamp(when)
+        else:
+            when = datetime.datetime(*when[:6])
+
+        # humanize output
+        now = datetime.datetime.utcnow()
+        difference = now - when
+        if difference < datetime.timedelta(minutes=2):
+            return "%s seconds ago" % difference.seconds
+        elif difference < datetime.timedelta(hours=2):
+            return "%s minutes ago" % (difference.seconds / 60)
+        elif difference < datetime.timedelta(days=2):
+            return "%s hours ago" % (difference.days * 24 + difference.seconds / 3600)
+        else:
+            return time.strftime("%c", when.timetuple())
 
     def doit(self, argv=[]):
         def _predicate_ttyrec(item, depth):
@@ -45,5 +65,15 @@ class ListCommand(object):
             if meta_data['title'] is not None:
                 title = "\"%s\"" % meta_data['title']
 
-            print "%s [%02d:%02d] %s" % (id, mins, secs, title)
+            commit_meta = Commit.iter_items(self.repo, "HEAD",
+                paths=meta_blob.path, max_count=1).next()
+            commit_data = Commit.iter_items(self.repo, "HEAD",
+                paths=data_blob.path, max_count=1).next()
+
+            date = commit_data.committed_date
+            if commit_meta.committed_date > commit_data.committed_date:
+                date = commit_meta.committed_date
+
+            print "%s [%02d:%02d] %s (%s)" % (
+                id, mins, secs, title, self._timesince(date))
 
