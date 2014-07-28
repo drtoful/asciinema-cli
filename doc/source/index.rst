@@ -1,0 +1,5 @@
+asciinema-cli
+=============
+
+.. toctree::
+    api
