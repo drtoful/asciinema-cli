@@ -16,6 +16,16 @@ class ServerMaintenanceError(Exception):
 
 
 class Uploader(object):
+    """
+    Sample Uploader that uploads asciicasts to a asciinema.org like
+    website, that implements that API.
+
+    :param api_url: base URL of the API endpoint
+    :param api_token: a API token to claim this asciicast
+
+    :raises ServerMaintenanceError: if the server is under maintenance
+    :raises ResourceNotFoundError: if the API endpoint does not exist
+    """
     def __init__(self, api_url, api_token, http_adapter=None):
         self.http_adapter = http_adapter
         if http_adapter is None:
@@ -24,6 +34,13 @@ class Uploader(object):
         self.api_token = api_token
 
     def upload(self, asciicast):
+        """
+        uploads the asciicast
+
+        :param asciicast: the :py:class:`~.asciicast.Asciicast` to upload
+
+        :returns: URL where this Asciicast is available
+        """
         url = '%s/api/asciicasts' % self.api_url
         files = self._asciicast_files(asciicast)
         headers = self._headers()

@@ -12,6 +12,24 @@ from asciinema.recorder import Recorder
 
 
 class Asciicast(object):
+    """
+    Basic class representing a Asciicast.
+
+    :param title: title of Asciicast
+    :param id: unique id of Asciicast
+
+    .. py:attribute:: recording
+
+        data of the last recording as a list of triples
+        in the form (seconds, microseconds, data)
+
+    .. py:attribute:: meta_data
+
+        meta data information of this asciicast. this is
+        a dictionary with the following keys:
+        id, username, duration, title, command, shell, term
+    """
+
     def _generate_id(self):
         md5 = hashlib.md5()
         md5.update(str(random.random()))
@@ -28,6 +46,34 @@ class Asciicast(object):
         self.id = id if id is not None else self._generate_id()
 
     def record(self, cmd=None, recorder=None, *args, **kwargs):
+        """
+        Start recording the TTY output of a given command.
+
+        :param cmd: the command to record the output. can be a string or a
+                    python function 'pointer'. :py:class:`None` will start
+                    the default system shell.
+        :param recorder: the :py:class:`~.recorder.Recorder` object to use
+                         for the recordings
+        :param kwargs: when using a python function as command, you can
+                         provide any number of arguments to this method, that
+                         get passed to the function.
+
+        This shows a simple example how to record the output of a python
+        method.
+
+        .. code-block:: python
+
+            from asciinema.asciicast import Asciicast
+
+            def print_fancy(message):
+                print "~~~ %s ~~~" % message
+
+            cast = Asciicast()
+            cast.record(print_fancy, message="Hello World!")
+
+        Every call to this method will update `recording` and `meta_data`
+        accordingly.
+        """
         if recorder is None:
             recorder = Recorder()
 
@@ -76,7 +122,12 @@ class Asciicast(object):
 
     def save(self, file):
         """
-        :param file: a File object
+        saves the content of this asciicast object to a specified file.
+        the contents of the file will be a JSON dictionary. it contains
+        the meta data and the recording.
+
+        :param file: a :py:class:`file` like object (open file descriptor
+                     handler)
         """
         data = {'meta': self.meta_data, 'data': self.recording}
         json.dump(data, file)
@@ -84,7 +135,12 @@ class Asciicast(object):
     @classmethod
     def load(class_, file):
         """
-        :param file: a File object
+        loads a previously saved Asciicast.
+
+        :param file: a :py:class:`file` like object (open file descriptor
+                     handler)
+
+        :returns: a new Asciicast object
         """
         data = json.load(file)
 
@@ -103,9 +159,22 @@ class Asciicast(object):
         return self
 
     def upload(self, uploader):
+        """
+        uploading the asciicast to a remote repository
+
+        :param uploader: the :py:class:`~.uploader.Uploader` to be
+                         used for uploading
+
+        :returns: URL were the uploaded Asciicast can be accessed at
+        """
         return uploader.upload(self)
 
     def as_ttyrec(self):
+        """
+        convert Asciicast to a ttyrec compatible file
+
+        :returns: ttyrec compatible string
+        """
         def _converter(secs, microsecs, data):
             return struct.pack("<I", secs) + struct.pack("<I", microsecs) + \
                 struct.pack("<I", len(data)) + data
