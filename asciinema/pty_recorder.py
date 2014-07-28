@@ -9,6 +9,7 @@ import termios
 import select
 import io
 import shlex
+import sys
 
 from .stdout import Stdout
 
@@ -96,6 +97,7 @@ class PtyRecorder(object):
         if pid == pty.CHILD:
             cmd, args, kwargs = command
             cmd(*args, **kwargs)
+            sys.exit(0)
 
         old_handler = signal.signal(signal.SIGWINCH, _signal_winch)
 
