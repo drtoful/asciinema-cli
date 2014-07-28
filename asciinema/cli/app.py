@@ -20,16 +20,12 @@ class AsciinemaCli(object):
         self.cast_repo = Repo(self.dir_files)
 
     def _save_local(self, cast):
-        ttyrec_file = os.path.join(self.dir_files, cast.id+".ttyrec")
-        meta_file = os.path.join(self.dir_files, cast.id+".meta")
+        filename = os.path.join(self.dir_files, cast.id+".asciicast")
 
-        with open(ttyrec_file, "w") as fp:
-            print >>fp, cast.as_ttyrec()
+        with open(filename, "w") as fp:
+            cast.save(fp)
 
-        with open(meta_file, "w") as fp:
-            print >>fp, json.dumps(cast.meta_data)
-
-        self.cast_repo.index.add([ttyrec_file, meta_file])
+        self.cast_repo.index.add([filename])
         self.cast_repo.index.commit("update recording '"+cast.id+"'")
 
     def do_record(self, arguments=[]):

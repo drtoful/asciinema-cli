@@ -6,6 +6,7 @@ import functools
 import random
 import hashlib
 import types
+import json
 
 from asciinema.recorder import Recorder
 
@@ -22,6 +23,8 @@ class Asciicast(object):
         self.term = os.environ.get('TERM')
         self.username = os.environ.get('USER')
         self.recording = []
+        self.lines = 80
+        self.columns = 25
         self.id = id if id is not None else self._generate_id()
 
     def record(self, cmd=None, recorder=None, *args, **kwargs):
@@ -39,6 +42,10 @@ class Asciicast(object):
         data = stdout.data
         i = 0
 
+        # create list containing triples
+        #  (seconds, microseconds, payload)
+        # -> this corresponds more or less an entry in a ttyrec
+        #    file
         for line in stdout.timing.split("\n"):
             timing, bytes = line.split(" ", 1)
             secs, microsecs = timing.split(".", 1)
@@ -46,6 +53,54 @@ class Asciicast(object):
             secs, microsecs, bytes = int(secs), int(microsecs), int(bytes)
             self.recording += [ (secs, microsecs, data[i:i+bytes]) ]
             i += bytes
+
+        # store the number of lines and columns after the execution
+        self.lines = int(get_command_output(['tput', 'lines']))
+        self.columns = int(get_command_output(['tput', 'cols']))
+
+        # store meta data information for the command
+        #  -> store string if a string is provided
+        #  -> store which function was called and with which options,
+        #     if the command is a python function
+        command = self.command
+        if not isinstance(command, str) and command is not None:
+            method, args, kwargs = command
+            module = method.__module__
+            if isinstance(method, types.MethodType):
+                module = module+"."+method.im_class.__name__
+            command = {
+                'pyfunc': module+"."+method.__name__,
+                'args': args,
+                'kwargs': kwargs
+            }
+
+    def save(self, file):
+        """
+        :param file: a File object
+        """
+        data = {'meta': self.meta_data, 'data': self.recording}
+        json.dump(data, file)
+
+    @classmethod
+    def load(class_, file):
+        """
+        :param file: a File object
+        """
+        data = json.load(file)
+
+        self = class_()
+        self.recording = data['data']
+        self.username = data['meta']['username']
+        self.duration = data['meta']['duration']
+        self.title = data['meta']['title']
+        self.command = data['meta']['command']
+        self.shell = data['meta']['shell']
+        self.term = data['meta']['term']['type']
+        self.lines = data['meta']['term']['lines']
+        self.columns = data['meta']['term']['columns']
+        self.id = data['meta']['id']
+
+        return self
 
     def upload(self, uploader=None):
         pass
@@ -59,31 +114,17 @@ class Asciicast(object):
 
     @property
     def meta_data(self):
-        lines = int(get_command_output(['tput', 'lines']))
-        columns = int(get_command_output(['tput', 'cols']))
-
-        command = self.command
-        if not isinstance(command, str) and command is not None:
-            method, args, kwargs = command
-            module = method.__module__
-            if isinstance(method, types.MethodType):
-                module = module+"."+method.im_class.__name__
-            command = {
-                'pyfunc': module+"."+method.__name__,
-                'args': args,
-                'kwargs': kwargs
-            }
-
         return {
+            'id'         : self.id,
             'username'   : self.username,
             'duration'   : self.duration,
             'title'      : self.title,
-            'command'    : command,
+            'command'    : self.command,
             'shell'      : self.shell,
             'term'       : {
                 'type'   : self.term,
-                'lines'  : lines,
-                'columns': columns
+                'lines'  : self.lines,
+                'columns': self.columns
             }
         }
 

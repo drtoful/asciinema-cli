@@ -4,6 +4,7 @@ import datetime
 import time
 
 from git import Blob, Commit
+from asciinema.asciicast import Asciicast
 
 class ListCommand(object):
     def __init__(self, repo):
@@ -29,51 +30,36 @@ class ListCommand(object):
             return time.strftime("%c", when.timetuple())
 
     def doit(self, argv=[]):
-        def _predicate_ttyrec(item, depth):
-            """find all ttyrec files in local git repository"""
+        def _predicate_cast(item, depth):
+            """find all asciicast files in local git repository"""
             if depth > 1:
                 return False
 
             if not isinstance(item, Blob):
                 return False
 
-            return item.path.endswith(".ttyrec")
+            return item.path.endswith(".asciicast")
 
-        def _predicate_meta(filename, item, depth):
-            """find a meta file with a specific name"""
-            if depth > 1:
-                return False
+        try:
+            head = self.repo.active_branch.commit
+        except ValueError:
+            # repository has currently no content (initial)
+            return
 
-            if not isinstance(item, Blob):
-                return False
-
-            return item.path == filename
-
-        head = self.repo.commit()
-        for data_blob in head.tree.traverse(predicate=_predicate_ttyrec):
+        for data_blob in head.tree.traverse(predicate=_predicate_cast):
             id,_ = data_blob.path.split(".")
-            meta_blob = head.tree.traverse(
-                predicate=functools.partial(_predicate_meta,id+".meta")).next()
+            cast = Asciicast.load(data_blob.data_stream)
 
-            # no metadata found
-            if meta_blob is None:
-                continue
-
-            meta_data = json.load(meta_blob.data_stream)
-            mins, secs = meta_data['duration'] // 60.0, meta_data['duration'] % 60
+            mins, secs = cast.duration // 60.0, cast.duration % 60
             title = "<no title>"
-            if meta_data['title'] is not None:
-                title = "\"%s\"" % meta_data['title']
+            if cast.title is not None:
+                title = "\"%s\"" % cast.title
 
-            commit_meta = Commit.iter_items(self.repo, "HEAD",
-                paths=meta_blob.path, max_count=1).next()
             commit_data = Commit.iter_items(self.repo, "HEAD",
                 paths=data_blob.path, max_count=1).next()
 
-            date = commit_data.committed_date
-            if commit_meta.committed_date > commit_data.committed_date:
-                date = commit_meta.committed_date
-
             print "%s [%02d:%02d] %s (%s)" % (
-                id, mins, secs, title, self._timesince(date))
+                id, mins, secs, title,
+                self._timesince(commit_data.committed_date)
+            )
 
