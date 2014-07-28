@@ -25,7 +25,8 @@ class PtyRecorder(object):
             of our own controlling terminal.
             '''
 
-            # Get the terminal size of the real terminal, set it on the pseudoterminal.
+            # Get the terminal size of the real terminal, set it
+            # on the pseudoterminal.
             if os.isatty(pty.STDOUT_FILENO):
                 buf = array.array('h', [0, 0, 0, 0])
                 fcntl.ioctl(pty.STDOUT_FILENO, termios.TIOCGWINSZ, buf, True)
@@ -40,7 +41,8 @@ class PtyRecorder(object):
             _set_pty_size()
 
         def _write_stdout(data):
-            '''Writes to stdout as if the child process had written the data.'''
+            '''Writes to stdout as if the child process had written
+               the data.'''
 
             os.write(pty.STDOUT_FILENO, data)
 
@@ -71,7 +73,8 @@ class PtyRecorder(object):
 
             while 1:
                 try:
-                    rfds, wfds, xfds = select.select([master_fd, pty.STDIN_FILENO], [], [])
+                    rfds, wfds, xfds = select.select(
+                        [master_fd, pty.STDIN_FILENO], [], [])
                 except select.error as e:
                     if e[0] == errno.EINTR:   # Interrupted system call.
                         continue
@@ -88,7 +91,6 @@ class PtyRecorder(object):
                     data = os.read(pty.STDIN_FILENO, 1024)
                     _handle_stdin_read(data)
 
-
         pid, master_fd = pty.fork()
 
         if pid == pty.CHILD:
@@ -101,7 +103,8 @@ class PtyRecorder(object):
             mode = tty.tcgetattr(pty.STDIN_FILENO)
             tty.setraw(pty.STDIN_FILENO)
             restore = 1
-        except tty.error: # This is the same as termios.error
+        # This is the same as termios.error
+        except tty.error:
             restore = 0
 
         _set_pty_size()

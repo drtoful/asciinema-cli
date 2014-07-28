@@ -9,8 +9,10 @@ from asciinema.uploader import Uploader
 from asciinema.uploader import ServerMaintenanceError
 from asciinema.uploader import ResourceNotFoundError
 
+
 class CastNotFound(Exception):
     pass
+
 
 class PushCommand(object):
     def __init__(self, repo, arguments=[]):
@@ -93,13 +95,14 @@ Optional arguments:
                 print('~ Upload succeeded: %s' % url)
         except ServerMaintenanceError:
             if not self.quiet:
-                print('~ Upload failed: The server is down for maintenance.' + \
+                print(
+                    '~ Upload failed: The server is down for maintenance.'
                     ' Try again in a minute.')
         except ResourceNotFoundError:
             if not self.quiet:
-                print('~ Upload failed: Your client version is no longer ' + \
+                print(
+                    '~ Upload failed: Your client version is no longer '
                     'supported. Please upgrade to the lastest version.')
         except CastNotFound:
             if not self.quiet:
                 print('~ Upload failed: asciicast could not be found')
-

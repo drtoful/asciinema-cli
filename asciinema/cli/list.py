@@ -6,6 +6,7 @@ import time
 from git import Blob, Commit
 from asciinema.asciicast import Asciicast
 
+
 class ListCommand(object):
     def __init__(self, repo, arguments=[]):
         self.repo = repo
@@ -25,7 +26,8 @@ class ListCommand(object):
         elif difference < datetime.timedelta(hours=2):
             return "%s minutes ago" % (difference.seconds / 60)
         elif difference < datetime.timedelta(days=2):
-            return "%s hours ago" % (difference.days * 24 + difference.seconds / 3600)
+            return "%s hours ago" % (
+                difference.days * 24 + difference.seconds / 3600)
         else:
             return time.strftime("%c", when.timetuple())
 
@@ -47,7 +49,7 @@ class ListCommand(object):
             return
 
         for data_blob in head.tree.traverse(predicate=_predicate_cast):
-            id,_ = data_blob.path.split(".")
+            id, _ = data_blob.path.split(".")
             cast = Asciicast.load(data_blob.data_stream)
 
             mins, secs = cast.duration // 60.0, cast.duration % 60
@@ -55,11 +57,10 @@ class ListCommand(object):
             if cast.title is not None:
                 title = "\"%s\"" % cast.title
 
-            commit_data = Commit.iter_items(self.repo, "HEAD",
-                paths=data_blob.path, max_count=1).next()
+            commit_data = Commit.iter_items(
+                self.repo, "HEAD", paths=data_blob.path, max_count=1).next()
 
             print "%s [%02d:%02d] %s (%s)" % (
                 id, mins, secs, title,
                 self._timesince(commit_data.committed_date)
             )
-

@@ -12,8 +12,8 @@ import uuid
 DEFAULT_CONFIG_FILE_PATH = "~/.asciinema/config"
 DEFAULT_API_URL = 'https://asciinema.org'
 
-class Config:
 
+class Config:
     def __init__(self, path=DEFAULT_CONFIG_FILE_PATH, overrides=None):
         self.path = os.path.expanduser(path)
         self.overrides = overrides if overrides is not None else os.environ

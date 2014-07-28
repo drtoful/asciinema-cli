@@ -9,8 +9,8 @@ from asciinema.cli.list import ListCommand
 from asciinema.cli.push import PushCommand
 from asciinema.cli.auth import AuthCommand
 
-class AsciinemaCli(object):
 
+class AsciinemaCli(object):
     def __init__(self):
         self.dir_home = os.path.join(os.path.expanduser("~"), ".asciinema")
         self.dir_files = os.path.join(self.dir_home, "casts")
@@ -62,4 +62,3 @@ Optional arguments:
 
         cmd = class_(self.cast_repo, argv)
         cmd.execute()
-

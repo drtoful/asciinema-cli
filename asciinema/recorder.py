@@ -19,7 +19,6 @@ class Recorder(object):
             cmd = os.environ.get('SHELL', '/bin/sh')
 
         if isinstance(cmd, str):
-            cmd = (_record_cmd,(cmd,),{})
+            cmd = (_record_cmd, (cmd,), {})
 
         return timer.timeit(self.pty_recorder.record_command, cmd)
-

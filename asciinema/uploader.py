@@ -6,11 +6,14 @@ import re
 from asciinema import __version__
 from asciinema.requests_http_adapter import RequestsHttpAdapter
 
+
 class ResourceNotFoundError(Exception):
     pass
 
+
 class ServerMaintenanceError(Exception):
     pass
+
 
 class Uploader(object):
     def __init__(self, api_url, api_token, http_adapter=None):
@@ -25,8 +28,8 @@ class Uploader(object):
         files = self._asciicast_files(asciicast)
         headers = self._headers()
 
-        status, headers, body = self.http_adapter.post(url, files=files,
-                                                            headers=headers)
+        status, headers, body = self.http_adapter.post(
+            url, files=files, headers=headers)
 
         if status == 503:
             raise ServerMaintenanceError()
@@ -57,7 +60,7 @@ class Uploader(object):
         }
 
     def _headers(self):
-        return { 'User-Agent': self._user_agent() }
+        return {'User-Agent': self._user_agent()}
 
     def _stdout_data_file(self, stdout):
         return ('stdout', bz2.compress(stdout.data))
@@ -77,6 +80,6 @@ class Uploader(object):
     def _user_agent(self):
         os = re.sub('([^-]+)-(.*)', '\\1/\\2', platform.platform())
 
-        return 'asciinema/%s %s/%s %s' % (__version__,
-            platform.python_implementation(), platform.python_version(), os)
-
+        return 'asciinema/%s %s/%s %s' % (
+            __version__, platform.python_implementation(),
+            platform.python_version(), os)

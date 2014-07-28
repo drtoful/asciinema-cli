@@ -10,8 +10,8 @@ import json
 
 from asciinema.recorder import Recorder
 
-class Asciicast(object):
 
+class Asciicast(object):
     def _generate_id(self):
         md5 = hashlib.md5()
         md5.update(str(random.random()))
@@ -51,7 +51,7 @@ class Asciicast(object):
             secs, microsecs = timing.split(".", 1)
 
             secs, microsecs, bytes = int(secs), int(microsecs), int(bytes)
-            self.recording += [ (secs, microsecs, data[i:i+bytes]) ]
+            self.recording += [(secs, microsecs, data[i:i+bytes])]
             i += bytes
 
         # store the number of lines and columns after the execution
@@ -107,23 +107,23 @@ class Asciicast(object):
 
     def as_ttyrec(self):
         def _converter(secs, microsecs, data):
-            return struct.pack("<I", secs)+struct.pack("<I", microsecs)+ \
-                struct.pack("<I", len(data))+data
+            return struct.pack("<I", secs) + struct.pack("<I", microsecs) + \
+                struct.pack("<I", len(data)) + data
 
         return "".join([_converter(*x) for x in self.recording])
 
     @property
     def meta_data(self):
         return {
-            'id'         : self.id,
-            'username'   : self.username,
-            'duration'   : self.duration,
-            'title'      : self.title,
-            'command'    : self.command,
-            'shell'      : self.shell,
-            'term'       : {
-                'type'   : self.term,
-                'lines'  : self.lines,
+            'id': self.id,
+            'username': self.username,
+            'duration': self.duration,
+            'title': self.title,
+            'command': self.command,
+            'shell': self.shell,
+            'term': {
+                'type': self.term,
+                'lines': self.lines,
                 'columns': self.columns
             }
         }

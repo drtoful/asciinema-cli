@@ -5,6 +5,7 @@ import getopt
 
 from asciinema.asciicast import Asciicast
 
+
 class RecordCommand(object):
     def __init__(self, repo, arguments=[]):
         try:
@@ -79,4 +80,3 @@ Optional arguments:
 
     def _reset_terminal(self):
         subprocess.call(["reset"])
-
