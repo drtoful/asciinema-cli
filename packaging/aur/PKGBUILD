@@ -6,7 +6,7 @@ pkgdesc="Command line recorder for asciinema.org service"
 arch=(any)
 url="https://github.com/sickill/asciinema"
 license=('MIT')
-depends=('python-requests>=1.1.0', 'python-setuptools')
+depends=('python-requests>=1.1.0', 'python-setuptools', 'python-git>=0.3.2')
 makedepends=('python-distribute')
 source=(https://pypi.python.org/packages/source/a/asciinema/asciinema-${pkgver}.tar.gz)
 md5sums=('ae8662d033af0e973d5864a247117e7f')

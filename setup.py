@@ -9,7 +9,8 @@ import asciinema
 url_template = 'https://github.com/sickill/asciinema/archive/v%s.tar.gz'
 
 requirements = [
-    'requests>=1.1.0'
+    'requests>=1.1.0',
+    'gitpython>=0.3.2'
 ]
 
 setup(
