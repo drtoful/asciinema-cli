@@ -7,7 +7,7 @@ from git import Blob, Commit
 from asciinema.asciicast import Asciicast
 
 class ListCommand(object):
-    def __init__(self, repo):
+    def __init__(self, repo, arguments=[]):
         self.repo = repo
 
     def _timesince(self, when):
@@ -29,7 +29,7 @@ class ListCommand(object):
         else:
             return time.strftime("%c", when.timetuple())
 
-    def doit(self, argv=[]):
+    def execute(self):
         def _predicate_cast(item, depth):
             """find all asciicast files in local git repository"""
             if depth > 1:

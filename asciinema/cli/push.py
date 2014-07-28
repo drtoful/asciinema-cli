@@ -47,11 +47,19 @@ class PushCommand(object):
             print(msg)
             print('')
 
-        print('usage: push [<option>] <id>')
-        print('-u <url>\tthe API url base, to upload the cast')
-        print('-t <str>\tthe API token to use')
-        print('-q\t\tdo not print messages (quiet)')
-        print('-h\t\tprint this help')
+        HELP_TEXT = """push [-u <url>] [-t <str>] [-q] [-h] <id>
+
+Upload asciicast to remote repository.
+
+Parameters:
+    <id>          id from local repository
+
+Optional arguments:
+    -u <url>      the API url base
+    -t <str>      the API token
+    -q            do not print messages (quiet)
+    -h            print this help"""
+        print(HELP_TEXT)
         sys.exit(1)
 
     def execute(self):

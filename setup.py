@@ -24,7 +24,7 @@ setup(
     download_url=(url_template % asciinema.__version__),
     entry_points={
         'console_scripts': [
-            'asciinema = asciinema.cli.app.AsciinemaCli:run',
+            'asciinema = asciinema.cli.app:AsciinemaCli.run',
         ],
     },
     install_requires=requirements,

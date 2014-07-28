@@ -1,8 +1,10 @@
-class AuthCommand(object):
+from asciinema.cli.config import Config
 
-    def __init__(self, api_url, api_token):
-        self.api_url = api_url
-        self.api_token = api_token
+class AuthCommand(object):
+    def __init__(self, repo, arguments=[]):
+        config = Config()
+        self.api_url = config.api_url
+        self.api_token = config.api_token
 
     def execute(self):
         url = '%s/connect/%s' % (self.api_url, self.api_token)

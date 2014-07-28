@@ -1,3 +1,4 @@
+import os
 import sys
 import subprocess
 import getopt
@@ -5,7 +6,7 @@ import getopt
 from asciinema.asciicast import Asciicast
 
 class RecordCommand(object):
-    def __init__(self, arguments=[]):
+    def __init__(self, repo, arguments=[]):
         try:
             opts, commands = getopt.getopt(arguments, "c:t:rqh", ['help'])
         except getopt.error as msg:
@@ -15,6 +16,7 @@ class RecordCommand(object):
         self.title = None
         self.reset = False
         self.quiet = False
+        self.repo = repo
 
         for opt, arg in opts:
             if opt in ('-h', '--help'):
@@ -33,12 +35,17 @@ class RecordCommand(object):
             print(msg)
             print('')
 
-        print('usage: record [<option>]')
-        print('-c <cmd>\tspecify command to execute')
-        print('-t <str>\ttitle of the asciicast')
-        print('-r\t\treset terminal before recording')
-        print('-q\t\tdo not print start and stop messages (quiet)')
-        print('-h\t\tprint this help')
+        HELP_TEXT = """record [-c <cmd>] [-t <str>] [-r] [-q] [-h]
+
+records a new Asciicast and stores it in local repository.
+
+Optional arguments:
+    -c <cmd>        specify command to execute
+    -t <str>        title of the new asciicast
+    -r              reset terminal before recording
+    -q              do not print messages (quiet)
+    -h              print this help"""
+        print(HELP_TEXT)
         sys.exit(1)
 
     def execute(self):
@@ -58,10 +65,17 @@ class RecordCommand(object):
         if self.reset:
             self._reset_terminal()
 
+        # save in local git repository
+        filename = os.path.join(self.repo.working_dir, cast.id+".asciicast")
+
+        with open(filename, "w") as fp:
+            cast.save(fp)
+
+        self.repo.index.add([filename])
+        self.repo.index.commit("update recording '"+cast.id+"'")
+
         if not self.quiet:
             print('~ Asciicast recording finished.')
-
-        return cast
 
     def _reset_terminal(self):
         subprocess.call(["reset"])
