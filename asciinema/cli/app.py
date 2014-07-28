@@ -8,6 +8,7 @@ from asciinema.cli.record import RecordCommand
 from asciinema.cli.list import ListCommand
 from asciinema.cli.push import PushCommand
 from asciinema.cli.auth import AuthCommand
+from asciinema.cli.clone import CloneCommand
 
 
 class AsciinemaCli(object):
@@ -41,6 +42,7 @@ Commands:
     list        list recorded asciicast in local repository
     push        upload a specific asciicasto
     auth        authenticate and/or claim recorded asciicasts
+    clone       clone a previously recorded asciicast
 
 Optional arguments:
     -h          display help for a command""" % (sys.argv[0])
@@ -58,6 +60,7 @@ Optional arguments:
             'list': ListCommand,
             'push': PushCommand,
             'auth': AuthCommand,
+            'clone': CloneCommand,
         }.get(command, _Help)
 
         cmd = class_(self.cast_repo, argv)

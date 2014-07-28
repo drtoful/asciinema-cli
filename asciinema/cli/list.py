@@ -60,7 +60,12 @@ class ListCommand(object):
             commit_data = Commit.iter_items(
                 self.repo, "HEAD", paths=data_blob.path, max_count=1).next()
 
-            print "%s [%02d:%02d] %s (%s)" % (
+            clone = cast.optional.get('clone', "")
+            if clone != "":
+                clone = ", cloned from %s" % clone
+
+            print "%s [%02d:%02d] %s (%s%s)" % (
                 id, mins, secs, title,
-                self._timesince(commit_data.committed_date)
+                self._timesince(commit_data.committed_date),
+                clone
             )

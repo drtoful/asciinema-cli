@@ -44,6 +44,7 @@ class Asciicast(object):
         self.lines = 80
         self.columns = 25
         self.id = id if id is not None else self._generate_id()
+        self.optional = {}
 
     def record(self, cmd=None, recorder=None, *args, **kwargs):
         """
@@ -146,15 +147,18 @@ class Asciicast(object):
 
         self = class_()
         self.recording = data['data']
-        self.username = data['meta']['username']
-        self.duration = data['meta']['duration']
-        self.title = data['meta']['title']
-        self.command = data['meta']['command']
-        self.shell = data['meta']['shell']
-        self.term = data['meta']['term']['type']
-        self.lines = data['meta']['term']['lines']
-        self.columns = data['meta']['term']['columns']
-        self.id = data['meta']['id']
+        self.username = data['meta'].get('username', None)
+        self.duration = data['meta'].get('duration', 0)
+        self.title = data['meta'].get('title', None)
+        self.command = data['meta'].get('command', None)
+        self.shell = data['meta'].get('shell', None)
+        term = data['meta'].get('term', None)
+        if term is not None:
+            self.term = term['type']
+            self.lines = term['lines']
+            self.columns = term['columns']
+        self.id = data['meta'].get('id', self._generate_id())
+        self.optional = data['meta'].get('optional', {})
 
         return self
 
@@ -194,7 +198,8 @@ class Asciicast(object):
                 'type': self.term,
                 'lines': self.lines,
                 'columns': self.columns
-            }
+            },
+            'optional': self.optional
         }
 
 
