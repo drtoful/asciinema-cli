@@ -29,7 +29,12 @@ class RecordCommand(object):
                 self.quiet = True
 
     def _help(self):
-        pass
+        print('-c <cmd>\tspecify command to execute')
+        print('-t <str>\ttitle of the asciicast')
+        print('-r\t\treset terminal before recording')
+        print('-q\t\tdo not print start and stop messages (quiet)')
+        print('-h\t\tprint this help')
+        sys.exit(1)
 
     def execute(self):
         if self.reset:
