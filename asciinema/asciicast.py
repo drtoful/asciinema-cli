@@ -102,8 +102,8 @@ class Asciicast(object):
 
         return self
 
-    def upload(self, uploader=None):
-        pass
+    def upload(self, uploader):
+        return uploader.upload(self)
 
     def as_ttyrec(self):
         def _converter(secs, microsecs, data):

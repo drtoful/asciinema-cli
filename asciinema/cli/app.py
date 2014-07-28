@@ -8,6 +8,7 @@ from asciinema.asciicast import Asciicast
 
 from asciinema.cli.record import RecordCommand
 from asciinema.cli.list import ListCommand
+from asciinema.cli.push import PushCommand
 
 class AsciinemaCli(object):
 
@@ -39,6 +40,10 @@ class AsciinemaCli(object):
         ls = ListCommand(self.cast_repo)
         ls.doit()
 
+    def do_push(self, arguments=[]):
+        cmd = PushCommand(self.cast_repo, arguments)
+        cmd.execute()
+
     def do_help(self):
         print >>sys.stderr, "usage: %s <command>" % sys.argv[0]
 
@@ -55,6 +60,8 @@ class AsciinemaCli(object):
             self.do_record(argv)
         elif command == "ls" or command == "list":
             self.do_list(argv)
+        elif command == "push":
+            self.do_push(argv)
         else:
             self.do_help()
 
