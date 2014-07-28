@@ -5,6 +5,8 @@ import sys
 from git import Repo
 from git.repo.fun import is_git_dir
 from asciinema.asciicast import Asciicast
+
+from asciinema.cli.record import RecordCommand
 from asciinema.cli.list import ListCommand
 
 class AsciinemaCli(object):
@@ -19,7 +21,12 @@ class AsciinemaCli(object):
             assert not self.cast_repo.bare
         self.cast_repo = Repo(self.dir_files)
 
-    def _save_local(self, cast):
+    def do_record(self, arguments=[]):
+        # do recording
+        cmd = RecordCommand(arguments)
+        cast = cmd.execute()
+
+        # save in local git repository
         filename = os.path.join(self.dir_files, cast.id+".asciicast")
 
         with open(filename, "w") as fp:
@@ -27,11 +34,6 @@ class AsciinemaCli(object):
 
         self.cast_repo.index.add([filename])
         self.cast_repo.index.commit("update recording '"+cast.id+"'")
-
-    def do_record(self, arguments=[]):
-        cast = Asciicast()
-        cast.record()
-        self._save_local(cast)
 
     def do_list(self, arguments=[]):
         ls = ListCommand(self.cast_repo)
