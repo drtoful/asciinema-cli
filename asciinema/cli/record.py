@@ -8,8 +8,8 @@ class RecordCommand(object):
     def __init__(self, arguments=[]):
         try:
             opts, commands = getopt.getopt(arguments, "c:t:rqh", ['help'])
-        except:
-            self._help()
+        except getopt.error as msg:
+            self._help(msg)
 
         self.cmd = None
         self.title = None
@@ -28,7 +28,12 @@ class RecordCommand(object):
             elif opt in ('-q'):
                 self.quiet = True
 
-    def _help(self):
+    def _help(self, msg=None):
+        if msg is not None:
+            print(msg)
+            print('')
+
+        print('usage: record [<option>]')
         print('-c <cmd>\tspecify command to execute')
         print('-t <str>\ttitle of the asciicast')
         print('-r\t\treset terminal before recording')

@@ -1,4 +1,6 @@
+import sys
 import functools
+import getopt
 
 from git import Blob
 from asciinema.asciicast import Asciicast
@@ -12,14 +14,45 @@ class CastNotFound(Exception):
 
 class PushCommand(object):
     def __init__(self, repo, arguments=[]):
+        try:
+            opts, commands = getopt.getopt(arguments, "u:t:qh", ['help'])
+        except getopt.error as msg:
+            self._help(msg)
+
         config = Config()
 
         self.repo = repo
         self.quiet = False
         self.api_url = config.api_url
         self.api_token = config.api_token
-        self.id = arguments[0]
 
+        # first non-option is the id to push
+        if len(commands) == 0:
+            self._help("no asciicast id specified")
+        self.id = commands[0]
+
+        # parsing arguments
+        for opt, arg in opts:
+            if opt in ('-h', '--help'):
+                self._help()
+            elif opt in ('-q'):
+                self.quiet = True
+            elif opt in ('-u'):
+                self.api_url = arg
+            elif opt in ('-t'):
+                self.api_token = arg
+
+    def _help(self, msg=None):
+        if msg is not None:
+            print(msg)
+            print('')
+
+        print('usage: push [<option>] <id>')
+        print('-u <url>\tthe API url base, to upload the cast')
+        print('-t <str>\tthe API token to use')
+        print('-q\t\tdo not print messages (quiet)')
+        print('-h\t\tprint this help')
+        sys.exit(1)
 
     def execute(self):
         def _predicate_file(file, item, depth):
